@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Report an Item{% endblock %}
+{% block content %}
+<h1 class="mb-4">Report a Lost or Found Item</h1>
+<form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Report type</label>
+      <select name="type" class="form-select" required>
+        <option value="lost">I lost something</option>
+        <option value="found">I found something</option>
+      </select>
+    </div>
+    <div class="col-md-8">
+      <label class="form-label">Title</label>
+      <input name="title" class="form-control" placeholder="e.g. Black Adidas backpack" required>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3"
+        placeholder="Color, brand, contents, distinguishing marks..." required></textarea>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Location</label>
+      <select name="location" class="form-select" required>
+        {% for loc in locations %}<option value="{{ loc }}">{{ loc }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">When (date &amp; time)</label>
+      <input type="datetime-local" name="time" class="form-control" required>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Contact (email/phone)</label>
+      <input name="contact" class="form-control" placeholder="you@college.edu" required>
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Photo (optional)</label>
+      <input type="file" name="image" class="form-control" accept="image/*">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Latitude (optional)</label>
+      <input name="lat" class="form-control" placeholder="12.9716">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Longitude (optional)</label>
+      <input name="lon" class="form-control" placeholder="77.5946">
+    </div>
+  </div>
+  <button class="btn btn-primary mt-4">Submit &amp; Find Matches</button>
+</form>
+{% endblock %}

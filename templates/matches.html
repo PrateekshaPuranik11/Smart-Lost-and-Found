@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Matches{% endblock %}
+{% block content %}
+<h1>Top Matches for: {{ report.title }}
+  <span class="badge {{ 'bg-danger' if report.type=='lost' else 'bg-success' }}">{{ report.type|upper }}</span>
+</h1>
+<p class="text-muted">{{ report.description }} &mdash; &#128205; {{ report.location }},
+   &#128336; {{ report.time.strftime('%d %b %Y, %H:%M') }}</p>
+
+{% if strong_count > 0 %}
+<div class="alert alert-success">&#127881; <strong>{{ strong_count }} strong match(es)</strong>
+  found (score &ge; {{ threshold }})!</div>
+{% else %}
+<div class="alert alert-warning">No strong matches yet (score &ge; {{ threshold }}).
+  New reports are re-checked automatically as they arrive.</div>
+{% endif %}
+
+{% for m in matches %}
+<div class="card mb-3 shadow-sm">
+  <div class="row g-0">
+    {% if m.image_path %}
+    <div class="col-md-2">
+      <img src="{{ url_for('static', filename=m.image_path) }}" class="img-fluid rounded-start" style="height:100%;object-fit:cover">
+    </div>
+    {% endif %}
+    <div class="col">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-secondary">{{ m.type|upper }}</span>
+            <h5 class="d-inline ms-2">{{ m.title }}</h5>
+          </div>
+          <span class="badge {{ 'bg-success' if m.score >= threshold else 'bg-warning text-dark' }} fs-6">
+            Match score: {{ "%.0f"|format(m.score * 100) }}%
+          </span>
+        </div>
+        <p class="card-text mt-2">{{ m.description }}</p>
+        <p class="small text-muted">&#128205; {{ m.location }} &nbsp; &#128336;
+           {{ m.time.strftime('%d %b %Y, %H:%M') }} &nbsp; &#128222; {{ m.contact }}</p>
+
+        <!-- score breakdown: this is the "intelligence" you show judges -->
+        <div class="small">
+          {% set parts = [('Description', m.breakdown.text), ('Location', m.breakdown.location), ('Time', m.breakdown.time)] %}
+          {% for label, val in parts %}
+          <div class="d-flex align-items-center mb-1" style="max-width:420px">
+            <span style="width:90px">{{ label }}</span>
+            <div class="progress flex-grow-1" style="height:8px">
+              <div class="progress-bar" style="width: {{ val * 100 }}%"></div>
+            </div>
+            <span class="ms-2 text-muted">{{ "%.0f"|format(val * 100) }}%</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <form method="post" action="{{ url_for('verify', report_id=m.id) }}" class="mt-2">
+          <button class="btn btn-outline-success btn-sm"
+            onclick="return confirm('Confirm this is the matching item?')">
+            &#10004; Verify &amp; Reunite</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
+<p>No reports of the opposite type exist yet.</p>
+{% endfor %}
+
+<a href="{{ url_for('home') }}" class="btn btn-secondary">&larr; All reports</a>
+{% endblock %}
